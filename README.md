@@ -16,14 +16,19 @@ It is useful when Elasticsearch's query syntax shows its limit ( eg [Nested docu
 
 ## Lexical declarations :
 
+- Any term or group of term following `+` is a `Must` condition.
+- Any term or group of term following `=` is a `MustNot` condition.
+- Any term or group of term without preceding operator is a `Should` condition.
 - A group is query inside delimiting `()`
 - Groups can have sub-groups
 - A term can be a single word 
 - A term can be a phrase between quote 
-- A term can a field, prefixed by `:` with or without a (single word or phrase) as value 
-- Any term or group of term following `+` is a `Must` condition.
-- Any term or group of term following `=` is a `MustNot` condition.
-- Any term or group of term without preceding operator is a `Should` condition.
+- A term can be a field, prefixed by `:` with or without a (single word or phrase) as value
+- Any field having a `>` after its `:` is a greater range condition.
+- Any field having a `<` after its `:` is a lower range condition.
+- Any field having a `=` after its `:` is a precise match condition.
+- Any field having a `~` after its `:` is a regex condition.
+
 
 ## Quirks
 
