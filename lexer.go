@@ -2,7 +2,6 @@ package yql_elastic
 
 import (
 	"github.com/olivere/elastic/v7"
-	"log"
 	"strings"
 	"unicode/utf8"
 )
@@ -43,7 +42,6 @@ type stateFn func(lexer *Lexer) stateFn
 // Parse
 // Main glue to parse a query
 func Parse(input string, opts ...ParserOption) (elastic.Query, error) {
-	log.Printf("Lexing : %s", input)
 	l := &Lexer{
 		input:         input,
 		query:         elastic.NewBoolQuery(),
@@ -141,7 +139,7 @@ func (lexer *Lexer) Run() (elastic.Query, error) {
 
 // Advance commits the parsing we just did to move to the next step.
 func (lexer *Lexer) Advance(emitedType itemType) {
-	log.Printf("Done with %s : %s", emitedType, lexer.value())
+	//log.Printf("Done with %s : %s", emitedType, lexer.value())
 	lexer.start = lexer.pos
 }
 

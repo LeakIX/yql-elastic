@@ -2,7 +2,6 @@ package yql_elastic
 
 import (
 	"errors"
-	"log"
 )
 // Default state
 func lexText(lexer *Lexer) stateFn {
@@ -105,7 +104,6 @@ func lexQueryGroup(lexer *Lexer) stateFn {
 	openDepth := 1
 	for {
 		rune := lexer.next()
-		log.Printf("at %s", string(rune))
 		if rune == eof {
 			lexer.lastError = errors.New("unclosed " + string(leftParenthesis))
 			return nil
@@ -123,12 +121,10 @@ func lexQueryGroup(lexer *Lexer) stateFn {
 			}
 		}
 		if rune == leftParenthesis && lexer.inQuote == noQuote {
-			log.Printf("opendepth++ %d", openDepth)
 			openDepth++
 			continue
 		}
 		if rune == rightParenthesis && lexer.inQuote == noQuote {
-			log.Printf("opendepth-- %d", openDepth)
 			openDepth--
 			if openDepth > 0 {
 				continue
