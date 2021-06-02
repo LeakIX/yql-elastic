@@ -65,7 +65,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gboddin/yql-elastic"
+	"github.com/LeakIX/yql-elastic"
 	"log"
 	"os"
 )
