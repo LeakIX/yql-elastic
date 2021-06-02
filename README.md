@@ -17,7 +17,7 @@ It is useful when Elasticsearch's query syntax shows its limit ( eg [Nested docu
 ## Lexical declarations :
 
 - Any term or group of term following `+` is a `Must` condition.
-- Any term or group of term following `=` is a `MustNot` condition.
+- Any term or group of term following `-` is a `MustNot` condition.
 - Any term or group of term without preceding operator is a `Should` condition.
 - A group is query inside delimiting `()`
 - Groups can have sub-groups
