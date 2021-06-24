@@ -61,28 +61,41 @@ func (lexer *Lexer) resetConditions() {
 	lexer.matchType = autoMatch
 }
 
+func (lexer *Lexer) GetTargetField(sourceField string) (targetField string) {
+	targetField = sourceField
+	for sourceName, targetName := range lexer.mappings {
+		if sourceField == sourceName {
+			targetField = targetName
+		}
+		if strings.HasPrefix(sourceField, sourceName+".") {
+			targetField = strings.Replace(lexer.field, sourceName, targetName, 1)
+		}
+	}
+	return targetField
+}
+
 // use accumulated information to create an elasticsearch query and adds it to the parser
 func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	var query elastic.Query
 	// Single term
 	if len(lexer.field) < 1 {
-		query = elastic.NewSimpleQueryStringQuery(lexer.value())
+		query = elastic.NewBoolQuery()
 		for _, field := range lexer.defaultFields {
-			query.(*elastic.SimpleQueryStringQuery).Field(field)
+			var subQuery elastic.Query
+			subQuery = elastic.NewSimpleQueryStringQuery(lexer.value()).Field(field)
+			for _, nestedPath := range lexer.nestedPaths {
+				if strings.HasPrefix(field, nestedPath+".") {
+					subQuery = elastic.NewNestedQuery(nestedPath, subQuery)
+				}
+			}
+			query.(*elastic.BoolQuery).Should(subQuery)
 		}
 		lexer.Advance(itemTerm)
 		return lexer.addQuery(query)
 	}
 	// Field logic
 	// Remap
-	for sourceName, targetName := range lexer.mappings {
-		if lexer.field == sourceName {
-			lexer.field = targetName
-		}
-		if strings.HasPrefix(lexer.field, sourceName+".") {
-			lexer.field = strings.Replace(lexer.field, sourceName, targetName, 1)
-		}
-	}
+	lexer.field = lexer.GetTargetField(lexer.field)
 	switch lexer.matchType {
 	case upperMatch:
 		query = elastic.NewRangeQuery(lexer.field).Gt(lexer.value())
