@@ -2,6 +2,7 @@ package yql_elastic
 
 import (
 	"github.com/olivere/elastic/v7"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -77,12 +78,16 @@ func (lexer *Lexer) GetTargetField(sourceField string) (targetField string) {
 // use accumulated information to create an elasticsearch query and adds it to the parser
 func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	var query elastic.Query
+	value, err := strconv.Unquote(lexer.value())
+	if err != nil {
+		value = lexer.value()
+	}
 	// Single term
 	if len(lexer.field) < 1 {
 		query = elastic.NewBoolQuery()
 		for _, field := range lexer.defaultFields {
 			var subQuery elastic.Query
-			subQuery = elastic.NewSimpleQueryStringQuery(lexer.value()).Field(field)
+			subQuery = elastic.NewSimpleQueryStringQuery(value).Field(field)
 			for _, nestedPath := range lexer.nestedPaths {
 				if strings.HasPrefix(field, nestedPath+".") {
 					subQuery = elastic.NewNestedQuery(nestedPath, subQuery)
@@ -98,19 +103,19 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	lexer.field = lexer.GetTargetField(lexer.field)
 	switch lexer.matchType {
 	case upperMatch:
-		query = elastic.NewRangeQuery(lexer.field).Gt(lexer.value())
+		query = elastic.NewRangeQuery(lexer.field).Gt(value)
 	case lowerMatch:
-		query = elastic.NewRangeQuery(lexer.field).Lt(lexer.value())
+		query = elastic.NewRangeQuery(lexer.field).Lt(value)
 	case keywordMatch:
-		query = elastic.NewTermQuery(lexer.field+".keyword", lexer.value())
+		query = elastic.NewTermQuery(lexer.field+".keyword",value)
 	case regexMatch:
-		query = elastic.NewRegexpQuery(lexer.field, lexer.value())
+		query = elastic.NewRegexpQuery(lexer.field,value)
 	case simpleQueryMatch:
-		query = elastic.NewSimpleQueryStringQuery(lexer.value()).Field(lexer.field)
+		query = elastic.NewSimpleQueryStringQuery(value).Field(lexer.field)
 	case autoMatch:
-		query = elastic.NewMatchQuery(lexer.field, lexer.value())
+		query = elastic.NewMatchQuery(lexer.field, value)
 	default:
-		query = elastic.NewMatchQuery(lexer.field, lexer.value())
+		query = elastic.NewMatchQuery(lexer.field,value)
 	}
 	for _, nestedPath := range lexer.nestedPaths {
 		if strings.HasPrefix(lexer.field, nestedPath+".") {
