@@ -62,7 +62,6 @@ func (lexer *Lexer) parseFieldType() {
 	case leftParenthesis:
 		lexer.matchType = simpleQueryMatch
 		lexer.Advance(itemLeftGroupDelim)
-		lexer.inQuote = rightParenthesis
 	}
 }
 
@@ -76,12 +75,14 @@ func lexTerm(lexer *Lexer) stateFn {
 			lexer.next()
 			continue
 		}
-		// WARNING : we can look for rightParenthesis as closing because of parseFieldType() when in field
-		if rune == doubleQuote ||  rune == singleQuote || rune == rightParenthesis  {
-			if lexer.inQuote != noQuote && lexer.inQuote == rune{
+		if rune == doubleQuote ||  rune == singleQuote || rune == rightParenthesis ||  rune == leftParenthesis {
+			if lexer.inQuote != noQuote && lexer.inQuote == rune {
 				lexer.inQuote = noQuote
-			} else if lexer.start == lexer.pos{
+			} else if lexer.inQuote == noQuote {
 				lexer.inQuote = rune
+				if rune == leftParenthesis {
+					lexer.inQuote = rightParenthesis
+				}
 			}
 		}
 		if rune == semiColon && lexer.pos != 0 && lexer.inQuote == noQuote {
