@@ -87,7 +87,7 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 		query = elastic.NewBoolQuery()
 		for _, field := range lexer.defaultFields {
 			var subQuery elastic.Query
-			subQuery = elastic.NewSimpleQueryStringQuery(value).Field(field)
+			subQuery = elastic.NewMatchQuery(field, value)
 			for _, nestedPath := range lexer.nestedPaths {
 				if strings.HasPrefix(field, nestedPath+".") {
 					subQuery = elastic.NewNestedQuery(nestedPath, subQuery)
