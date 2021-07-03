@@ -78,16 +78,23 @@ func (lexer *Lexer) GetTargetField(sourceField string) (targetField string) {
 // use accumulated information to create an elasticsearch query and adds it to the parser
 func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	var query elastic.Query
+	var inQuote bool = false
 	value, err := strconv.Unquote(lexer.value())
 	if err != nil {
 		value = lexer.value()
+	} else {
+		inQuote = true
 	}
 	// Single term
 	if len(lexer.field) < 1 {
 		query = elastic.NewBoolQuery()
 		for _, field := range lexer.defaultFields {
 			var subQuery elastic.Query
-			subQuery = elastic.NewMatchQuery(field, value)
+			if inQuote {
+				subQuery = elastic.NewMatchPhraseQuery(field, value)
+			} else {
+				subQuery = elastic.NewMatchQuery(field, value)
+			}
 			for _, nestedPath := range lexer.nestedPaths {
 				if strings.HasPrefix(field, nestedPath+".") {
 					subQuery = elastic.NewNestedQuery(nestedPath, subQuery)
@@ -113,9 +120,17 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	case simpleQueryMatch:
 		query = elastic.NewSimpleQueryStringQuery(value).Field(lexer.field)
 	case autoMatch:
-		query = elastic.NewMatchQuery(lexer.field, value)
+		if inQuote {
+			query = elastic.NewMatchPhraseQuery(lexer.field, value)
+		} else {
+			query = elastic.NewMatchQuery(lexer.field, value)
+		}
 	default:
-		query = elastic.NewMatchQuery(lexer.field,value)
+		if inQuote {
+			query = elastic.NewMatchPhraseQuery(lexer.field, value)
+		} else {
+			query = elastic.NewMatchQuery(lexer.field, value)
+		}
 	}
 	for _, nestedPath := range lexer.nestedPaths {
 		if strings.HasPrefix(lexer.field, nestedPath+".") {
