@@ -3,6 +3,7 @@ package yql_elastic
 import (
 	"errors"
 )
+
 // Default state
 func lexText(lexer *Lexer) stateFn {
 	for {
@@ -19,7 +20,7 @@ func lexText(lexer *Lexer) stateFn {
 			continue
 		}
 		// Group
-		if rune == leftParenthesis  {
+		if rune == leftParenthesis {
 			return lexQueryGroup(lexer)
 		}
 		// Must
@@ -29,7 +30,7 @@ func lexText(lexer *Lexer) stateFn {
 			continue
 		}
 		// MustNot
-		if rune == minusSign  {
+		if rune == minusSign {
 			lexer.nextCondition = queryMustNot
 			lexer.Advance(itemMustNot)
 			continue
@@ -75,7 +76,7 @@ func lexTerm(lexer *Lexer) stateFn {
 			lexer.next()
 			continue
 		}
-		if rune == doubleQuote ||  rune == singleQuote || rune == rightParenthesis ||  rune == leftParenthesis {
+		if rune == doubleQuote || rune == singleQuote || rune == rightParenthesis || rune == leftParenthesis {
 			if lexer.inQuote != noQuote && lexer.inQuote == rune {
 				lexer.inQuote = noQuote
 			} else if lexer.inQuote == noQuote {
@@ -92,7 +93,7 @@ func lexTerm(lexer *Lexer) stateFn {
 			lexer.Advance(itemField)
 			lexer.parseFieldType()
 		}
-		if rune == eof || (rune == whiteSpace && lexer.inQuote == noQuote ) {
+		if rune == eof || (rune == whiteSpace && lexer.inQuote == noQuote) {
 			lexer.commitQuery()
 			return lexText(lexer)
 		}
@@ -114,8 +115,8 @@ func lexQueryGroup(lexer *Lexer) stateFn {
 			lexer.next()
 			continue
 		}
-		if rune == doubleQuote ||  rune == singleQuote {
-			if lexer.inQuote != noQuote && lexer.inQuote == rune{
+		if rune == doubleQuote || rune == singleQuote {
+			if lexer.inQuote != noQuote && lexer.inQuote == rune {
 				lexer.inQuote = noQuote
 			} else {
 				lexer.inQuote = rune

@@ -12,7 +12,7 @@ type Lexer struct {
 	// Starting position of the currently parsed operation
 	start int
 	// Position of the currently parsed operation
-	pos   int
+	pos int
 	// Length of the next char in bytes ( UFT-8 )
 	width int
 	// Accumulated elasticsearch Query storing conditions
@@ -22,19 +22,21 @@ type Lexer struct {
 	// field we're in if any
 	field string
 	// field match type
-	matchType     matchType
+	matchType matchType
 	// Default fields for no-field terms
 	defaultFields []string
+	// Field Callbacks
+	fieldCallbacks map[string]FieldCallBack
 	// Last error
-	lastError     error
+	lastError error
 	// Lexer/Parser options
-	options       []ParserOption
+	options []ParserOption
 	// Nested path
-	nestedPaths   []string
+	nestedPaths []string
 	// Static alias
-	mappings      map[string]string
+	mappings map[string]string
 	// Is set to the next closing delimiter : noQuote, doubleQuote, singleQuote or rightParenthesis
-	inQuote       rune
+	inQuote rune
 }
 
 // State function type for moving between states
@@ -47,7 +49,7 @@ func Parse(input string, opts ...ParserOption) (elastic.Query, error) {
 		input:         input,
 		query:         elastic.NewBoolQuery(),
 		nextCondition: queryShould,
-		inQuote: noQuote,
+		inQuote:       noQuote,
 		options:       opts,
 		matchType:     autoMatch,
 		field:         "",
@@ -89,11 +91,18 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	if len(lexer.field) < 1 {
 		query = elastic.NewBoolQuery()
 		for _, field := range lexer.defaultFields {
+			fieldValue := value
+			if callback, hasCallback := lexer.fieldCallbacks[field]; hasCallback {
+				fieldValue, err = callback(fieldValue)
+				if err != nil {
+					lexer.lastError = err
+				}
+			}
 			var subQuery elastic.Query
 			if inQuote {
-				subQuery = elastic.NewMatchPhraseQuery(field, value)
+				subQuery = elastic.NewMatchPhraseQuery(field, fieldValue)
 			} else {
-				subQuery = elastic.NewMatchQuery(field, value)
+				subQuery = elastic.NewMatchQuery(field, fieldValue)
 			}
 			for _, nestedPath := range lexer.nestedPaths {
 				if strings.HasPrefix(field, nestedPath+".") {
@@ -108,15 +117,22 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	// Field logic
 	// Remap
 	lexer.field = lexer.GetTargetField(lexer.field)
+	// Callback
+	if callback, hasCallback := lexer.fieldCallbacks[lexer.field]; hasCallback {
+		value, err = callback(value)
+		if err != nil {
+			lexer.lastError = err
+		}
+	}
 	switch lexer.matchType {
 	case upperMatch:
 		query = elastic.NewRangeQuery(lexer.field).Gt(value)
 	case lowerMatch:
 		query = elastic.NewRangeQuery(lexer.field).Lt(value)
 	case keywordMatch:
-		query = elastic.NewTermQuery(lexer.field+".keyword",value)
+		query = elastic.NewTermQuery(lexer.field+".keyword", value)
 	case regexMatch:
-		query = elastic.NewRegexpQuery(lexer.field,value)
+		query = elastic.NewRegexpQuery(lexer.field, value)
 	case simpleQueryMatch:
 		query = elastic.NewSimpleQueryStringQuery(value).Field(lexer.field)
 	case autoMatch:

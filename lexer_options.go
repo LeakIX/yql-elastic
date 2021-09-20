@@ -2,6 +2,18 @@ package yql_elastic
 
 type ParserOption func(lexer *Lexer) error
 
+type FieldCallBack func(text string) (string, error)
+
+func WithFieldCallBack(fieldName string, back FieldCallBack) ParserOption {
+	return func(lexer *Lexer) (err error) {
+		if lexer.fieldCallbacks == nil {
+			lexer.fieldCallbacks = make(map[string]FieldCallBack)
+		}
+		lexer.fieldCallbacks[fieldName] = back
+		return nil
+	}
+}
+
 func WithDefaultFields(fields []string) ParserOption {
 	return func(lexer *Lexer) (err error) {
 		lexer.defaultFields = fields
