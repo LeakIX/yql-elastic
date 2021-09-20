@@ -28,6 +28,9 @@ func main() {
 		}),
 	)
 	if err != nil {
+		if err, isFieldError := err.(yql_elastic.FieldCallBackError); isFieldError {
+			log.Fatalf("field error %s : %s", err.FieldName, err.FieldValue)
+		}
 		log.Fatal(err)
 	}
 	querySource, err := elasticQuery.Source()

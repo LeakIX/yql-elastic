@@ -95,7 +95,11 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 			if callback, hasCallback := lexer.fieldCallbacks[field]; hasCallback {
 				fieldValue, err = callback(fieldValue)
 				if err != nil {
-					lexer.lastError = err
+					lexer.lastError = FieldCallBackError{
+						error:      err,
+						FieldName:  field,
+						FieldValue: value,
+					}
 				}
 			}
 			var subQuery elastic.Query
@@ -121,7 +125,11 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	if callback, hasCallback := lexer.fieldCallbacks[lexer.field]; hasCallback {
 		value, err = callback(value)
 		if err != nil {
-			lexer.lastError = err
+			lexer.lastError = FieldCallBackError{
+				error:      err,
+				FieldName:  lexer.field,
+				FieldValue: value,
+			}
 		}
 	}
 	switch lexer.matchType {

@@ -4,6 +4,12 @@ type ParserOption func(lexer *Lexer) error
 
 type FieldCallBack func(text string) (string, error)
 
+type FieldCallBackError struct {
+	error
+	FieldName  string
+	FieldValue string
+}
+
 func WithFieldCallBack(fieldName string, back FieldCallBack) ParserOption {
 	return func(lexer *Lexer) (err error) {
 		if lexer.fieldCallbacks == nil {
