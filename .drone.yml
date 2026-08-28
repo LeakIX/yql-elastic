@@ -1,0 +1,48 @@
+kind: pipeline
+name: build
+
+trigger:
+  event:
+    - push
+    - tag
+
+workspace:
+  path: /drone/yql-elastic
+
+steps:
+  - name: gofmt
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - make check-format
+    depends_on: [clone]
+
+  - name: govet
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - make vet
+    depends_on: [clone]
+
+  - name: test
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - make test
+    depends_on: [govet]
+
+  - name: govulncheck
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - make vuln
+    depends_on: [test]
+
+  - name: golangci-lint
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - make lint
+    depends_on: [govulncheck]
+
+  - name: changelog
+    image: git.mgmt.leakix.net/leakix/gobuild:v9
+    commands:
+      - git fetch --unshallow 2>/dev/null || true
+      - make check-changelog
+    depends_on: [clone]
