@@ -60,3 +60,5 @@ const (
 )
 
 const eof = -1
+
+const keywordSuffix = ".keyword"
