@@ -2,7 +2,7 @@ module github.com/LeakIX/yql-elastic
 
 go 1.26
 
-require github.com/olivere/elastic/v7 v7.0.24
+require github.com/olivere/elastic/v7 v7.0.32
 
 require (
 	github.com/josharian/intern v1.0.0 // indirect
