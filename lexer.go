@@ -12,7 +12,7 @@ type Lexer struct {
 	// Starting position of the currently parsed operation
 	start int
 	// Position of the currently parsed operation
-	pos   int
+	pos int
 	// Length of the next char in bytes ( UFT-8 )
 	width int
 	// Accumulated elasticsearch Query storing conditions
@@ -22,32 +22,31 @@ type Lexer struct {
 	// field we're in if any
 	field string
 	// field match type
-	matchType     matchType
+	matchType matchType
 	// Default fields for no-field terms
 	defaultFields []string
 	// Last error
-	lastError     error
+	lastError error
 	// Lexer/Parser options
-	options       []ParserOption
+	options []ParserOption
 	// Nested path
-	nestedPaths   []string
+	nestedPaths []string
 	// Static alias
-	mappings      map[string]string
+	mappings map[string]string
 	// Is set to the next closing delimiter : noQuote, doubleQuote, singleQuote or rightParenthesis
-	inQuote       rune
+	inQuote rune
 }
 
 // State function type for moving between states
 type stateFn func(lexer *Lexer) stateFn
 
-// Parse
-// Main glue to parse a query
+// Parse a YQL query string into an Elasticsearch query.
 func Parse(input string, opts ...ParserOption) (elastic.Query, error) {
 	l := &Lexer{
 		input:         input,
 		query:         elastic.NewBoolQuery(),
 		nextCondition: queryShould,
-		inQuote: noQuote,
+		inQuote:       noQuote,
 		options:       opts,
 		matchType:     autoMatch,
 		field:         "",
@@ -78,7 +77,7 @@ func (lexer *Lexer) GetTargetField(sourceField string) (targetField string) {
 // use accumulated information to create an elasticsearch query and adds it to the parser
 func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	var query elastic.Query
-	var inQuote bool = false
+	var inQuote bool
 	value, err := strconv.Unquote(lexer.value())
 	if err != nil {
 		value = lexer.value()
@@ -114,9 +113,9 @@ func (lexer *Lexer) commitQuery() *elastic.BoolQuery {
 	case lowerMatch:
 		query = elastic.NewRangeQuery(lexer.field).Lt(value)
 	case keywordMatch:
-		query = elastic.NewTermQuery(lexer.field+".keyword",value)
+		query = elastic.NewTermQuery(lexer.field+keywordSuffix, value)
 	case regexMatch:
-		query = elastic.NewRegexpQuery(lexer.field,value)
+		query = elastic.NewRegexpQuery(lexer.field, value)
 	case simpleQueryMatch:
 		query = elastic.NewSimpleQueryStringQuery(value).Field(lexer.field)
 	case autoMatch:

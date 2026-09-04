@@ -43,20 +43,22 @@ const (
 )
 
 const (
-	noQuote          rune = 0
-	singleQuote           = '\''
-	doubleQuote           = '"'
-	plusSign              = '+'
-	minusSign             = '-'
-	whiteSpace            = ' '
-	leftParenthesis       = '('
-	rightParenthesis      = ')'
-	escapeChar            = '\\'
-	semiColon             = ':'
-	lowerThan             = '<'
-	greaterThan           = '>'
-	equalSign             = '='
-	tildeSign             = '~'
+	noQuote          = 0
+	singleQuote      = '\''
+	doubleQuote      = '"'
+	plusSign         = '+'
+	minusSign        = '-'
+	whiteSpace       = ' '
+	leftParenthesis  = '('
+	rightParenthesis = ')'
+	escapeChar       = '\\'
+	semiColon        = ':'
+	lowerThan        = '<'
+	greaterThan      = '>'
+	equalSign        = '='
+	tildeSign        = '~'
 )
 
 const eof = -1
+
+const keywordSuffix = ".keyword"
