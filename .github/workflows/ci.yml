@@ -13,16 +13,16 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      # https://github.com/actions/checkout/blob/11d5960a326750d5838078e36cf38b85af677262/README.md#v4
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      # https://github.com/actions/checkout/blob/3d3c42e5aac5ba805825da76410c181273ba90b1/README.md#v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           # The changelog check verifies that every commit referenced in
           # CHANGELOG.md exists, which requires the full history.
           fetch-depth: 0
 
-      # https://github.com/actions/setup-go/blob/40f1582b2485089dde7abd97c1529aa768e1baff/README.md#v5
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+      # https://github.com/actions/setup-go/blob/b7ad1dad31e06c5925ef5d2fc7ad053ef454303e/README.md#v7.0.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
 
@@ -50,7 +50,7 @@ jobs:
       - name: changelog
         run: make check-changelog
 
-      # https://github.com/zizmorcore/zizmor-action/blob/6fc4b006235f201fdab3722e17240ab420d580e5/README.md
+      # https://github.com/zizmorcore/zizmor-action/blob/70fb788f84895a7701f5643d103d587e460b5c99/README.md
       - name: zizmor
         uses: zizmorcore/zizmor-action@70fb788f84895a7701f5643d103d587e460b5c99 # v0.6.3
         with:
