@@ -21,8 +21,8 @@ jobs:
           # CHANGELOG.md exists, which requires the full history.
           fetch-depth: 0
 
-      # https://github.com/actions/setup-go/blob/67f64d9d75b0e285a43de70ac93843ea71b1c945/README.md#v7.0.0
-      - uses: actions/setup-go@67f64d9d75b0e285a43de70ac93843ea71b1c945 # v7.0.0
+      # https://github.com/actions/setup-go/blob/b7ad1dad31e06c5925ef5d2fc7ad053ef454303e/README.md#v7.0.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
 
