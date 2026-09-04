@@ -18,7 +18,9 @@ All notable changes to this project will be documented in this file.
 - Bumped `olivere/elastic/v7` from 7.0.24 to 7.0.32 ([bf11e73])
 - Bumped `zizmorcore/zizmor-action` from 0.6.1 to 0.6.3 ([247d75e])
 - Bumped `actions/setup-go` from 5.6.0 to 7.0.0 and
-  `actions/checkout` from 4.4.0 to 7.0.1 ([2036f5c])
+  `actions/checkout` from 4.4.0 to 7.0.1 ([a68b6fd])
+- Added `cooldown: default-days: 7` to dependabot updates to satisfy the
+  zizmor `dependabot-cooldown` audit ([2658f7f])
 
 ## [0.1.1]
 
@@ -52,4 +54,5 @@ All notable changes to this project will be documented in this file.
 [8b68f39]: https://github.com/LeakIX/yql-elastic/commit/8b68f39
 [bf11e73]: https://github.com/LeakIX/yql-elastic/commit/bf11e73
 [247d75e]: https://github.com/LeakIX/yql-elastic/commit/247d75e
-[2036f5c]: https://github.com/LeakIX/yql-elastic/commit/2036f5c
+[a68b6fd]: https://github.com/LeakIX/yql-elastic/commit/a68b6fd
+[2658f7f]: https://github.com/LeakIX/yql-elastic/commit/2658f7f
